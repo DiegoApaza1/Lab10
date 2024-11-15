@@ -1,6 +1,7 @@
-package com.tecsup.lab10.view
+package com.example.lab10.view
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -8,22 +9,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -31,9 +25,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.tecsup.lab10.data.SerieApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import com.example.lab10.data.SerieApiService
+import com.example.lab10.view.ContenidoSerieEditar
+import com.example.lab10.view.ContenidoSerieEliminar
+import com.example.lab10.view.ContenidoSeriesListado
 
 @Composable
 fun SeriesApp() {
@@ -44,11 +41,11 @@ fun SeriesApp() {
     val navController = rememberNavController()
 
     Scaffold(
-        modifier = Modifier.padding(top=40.dp),
-        topBar =    { BarraSuperior() },
+        modifier = Modifier.padding(top = 40.dp),
+        topBar = { BarraSuperior() },
         bottomBar = { BarraInferior(navController) },
         floatingActionButton = { BotonFAB(navController, servicio) },
-        content =   { paddingValues -> Contenido(paddingValues, navController, servicio) }
+        content = { paddingValues -> Contenido(paddingValues, navController, servicio) }
     )
 }
 
@@ -122,20 +119,51 @@ fun Contenido(
             navController = navController,
             startDestination = "inicio" // Ruta de inicio
         ) {
-            composable("inicio") { ScreenInicio() }
+            composable("inicio") { ScreenInicio(navController) }
             composable("series") { ContenidoSeriesListado(navController, servicio) }
             composable("serieNuevo") {
-                ContenidoSerieEditar(navController, servicio, 0 )
+                ContenidoSerieEditar(navController, servicio, 0)
             }
             composable("serieVer/{id}", arguments = listOf(
-                navArgument("id") { type = NavType.IntType} )
+                navArgument("id") { type = NavType.IntType })
             ) {
                 ContenidoSerieEditar(navController, servicio, it.arguments!!.getInt("id"))
             }
             composable("serieDel/{id}", arguments = listOf(
-                navArgument("id") { type = NavType.IntType} )
+                navArgument("id") { type = NavType.IntType })
             ) {
                 ContenidoSerieEliminar(navController, servicio, it.arguments!!.getInt("id"))
+            }
+        }
+    }
+}
+
+@Composable
+fun ScreenInicio(navController: NavHostController) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Bienvenido a Series App",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Esta aplicación te permite gestionar tus series favoritas.",
+                fontSize = 16.sp,
+                modifier = Modifier.padding(top = 16.dp, bottom = 32.dp)
+            )
+            Button(
+                onClick = {
+                    navController.navigate("series")
+                }
+            ) {
+                Text("Ver Series")
             }
         }
     }
